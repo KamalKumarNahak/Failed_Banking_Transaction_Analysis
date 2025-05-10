@@ -1,0 +1,36 @@
+
+first create an instance in the cloud sql
+
+bucket creation:
+++++++++++++++++++
+gsutil mb gs://kamalkumar-bucket/
+
+
+cluster creation:
++++++++++++++++++++
+gcloud dataproc clusters create training-cluster --region=us-central1 --zone=us-central1-a --single-node --master-machine-type=n1-standard-2 --image-version=2.0-debian10 --enable-component-gateway --optional-components=JUPYTER
+
+adding all datasets to the bucket:
++++++++++++++++++++++++++++++++++++
+gsutil cp "E:/revature/p1bankproject/new_dataset/*.csv" gs://kamalkumar-bucket/transactions/
+
+adding pyspark job files to the bucket:
++++++++++++++++++++++++++++++++++++++++
+gsutil cp "E:/revature/p1banking/cleancode.py" gs://kamalkumar-bucket/scripts/
+gsutil cp "E:/revature/p1banking/failedtrans.py" gs://kamalkumar-bucket/scripts/
+
+adding jar file to the bucket:
+++++++++++++++++++++++++++++++++
+link to download jar file:https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.0.33/
+
+gsutil cp "C:/mysql-jars/mysql-connector-j-8.0.33.jar" gs://kamalkumar-bucket/jars/
+
+job sumission:
++++++++++++++++
+job submisiion for cleaned datasetcode named cleancode.py:
+gcloud dataproc jobs submit pyspark gs://kamalkumar-bucket/scripts/cleancode.py --cluster=training-cluster --region=us-central1 --jars=gs://kamalkumar-bucket/jars/mysql-connector-j-8.0.33.jar --properties=spark.driver.memory=4g,spark.executor.memory=4g
+
+job sumission:
++++++++++++++++
+job submission for failed transactions datasetcode named failedtrans.py  
+gcloud dataproc jobs submit pyspark gs://kamalkumar-bucket/scripts/failedtrans.py --cluster=training-cluster --region=us-central1 --jars=gs://kamalkumar-bucket/jars/mysql-connector-j-8.0.33.jar --properties=spark.driver.memory=4g,spark.executor.memory=4g
